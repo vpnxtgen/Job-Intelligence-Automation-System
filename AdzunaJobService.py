@@ -1,98 +1,163 @@
 import json
+from dotenv import load_dotenv
+import os
 from dataclasses import dataclass
 from urllib.parse import urlencode
 import requests
 import pandas as pd
-'''
- @Description : Adzure job service to get the job details from adzune api.
- 
-'''
+from AIClient import AIClient as AIAgent # Commented out as per original context
 
+
+
+# ADZUNE_APP_ID AND ADZUNE_API_KEY
 @dataclass
 class AdzureApiParam:
-    category : str 
-    max_days_old : str 
-    what : str 
-    where : str 
-    sort_by : str
-    country : str
-    page : str 
-    
-
+    category: str 
+    max_days_old: str 
+    what: str 
+    where: str 
+    sort_by: str
+    country: str
+    page: str 
     
 
 class AdzunaJobService:
-    
-    __appId = '4caafcbc' 
-    __apikey =  '56c1aeb4801d7f49e3bb39c38d56f270'
-    def __init__(self,):
+    __appId : str
+    __apikey : str
+    _search_data = str
+
+    def __init__(self, data : str):
         print('Inside the Adzure job service constructor')
+        load_dotenv()
+        self.__appId = os.getenv('ADZUNE_APP_ID')
+        self.__apikey = os.getenv('ADZUNE_API_KEY')
+        self._search_data = data
         
-    def parse_data(self, paramjSON : str) -> AdzureApiParam :
-        data = json.loads(paramjSON)
-        print('data**********',data.get('category'))
-        if data:
+    def parse_data(self, paramjSON: str) -> AdzureApiParam:
+        try:
+            data = json.loads(paramjSON)
+            if not data:
+                raise ValueError("JSON input is empty")
+            
             return AdzureApiParam(
-                category  = data.get('category','it-jobs'),
-                max_days_old = data.get("max_days_old",2),
-                what = data.get("what","salesforce developer"),
-                where = data.get("where","Bengaluru OR Hyderabad"),
-                sort_by = data.get("sort_by","date"),
-                country= data.get("country","in"),
-                page = data.get("page","1")
+                category=data.get('category', 'it-jobs'),
+                max_days_old=data.get("max_days_old", 2),
+                what=data.get("what", "salesforce developer"),
+                where=data.get("where", "Bengaluru OR Hyderabad"),
+                sort_by=data.get("sort_by", "date"),
+                country=data.get("country", "in"),
+                page=data.get("page", "1")
             )
+        except json.JSONDecodeError as e:
+            print(f"Error: Invalid JSON format provided - {e}")
+            return None
+        except Exception as e:
+            print(f"Error occurred during parsing: {e}")
+            return None
     
-    def job_search(self, json_data):
-        if json_data:
-            params = self.parse_data(json_data)
-            
+    def job_search(self):
+        params = self.parse_data(self._search_data)
+        if not params:
+            print("Job search aborted due to invalid parameters.")
+            return
+
+        try:
             base_url = f"https://api.adzuna.com/v1/api/jobs/{params.country}/search/{params.page}?"
-            
             query_params = {
-                "app_id" : self.__appId,
-                "app_key" : self.__apikey,
-                "category" : params.category,
-                "max_days_old" : params.max_days_old,
-                "what" : params.what,
-                "where" : params.where,
-                "sort_by" : params.sort_by
+                "app_id": self.__appId,
+                "app_key": self.__apikey,
+                "category": params.category,
+                "max_days_old": params.max_days_old,
+                "what": params.what,
+                "where": params.where,
+                "sort_by": params.sort_by
             }
             
-            serviceQuery = base_url +urlencode(query_params)
+            serviceQuery = base_url + urlencode(query_params)
+            print(f'Fetching jobs from: {serviceQuery}')
             
-            print('serviceQuery*******************',serviceQuery)
-            
+            # Use a try block for the network request
             response = requests.get(serviceQuery, timeout=10)
             
-            if response.status_code == 200 :
-                
-                #print('response code****************',response.status_code)
-                #print('response body****************',response.json())
-                
-                jsonRes =  response.json() 
-                #print('response result****************',jsonRes.get('results'))
-                job_details = []
-                if jsonRes.get('results'):
-                    for result in jsonRes.get('results'):
-                        job_detail = dict();
-                        job_detail['id'] = result.get('id')
-                        company = result.get('company')
-                        job_detail['company_name'] = company.get('display_name')
-                        job_detail['title'] = result.get('title')
-                        job_details.append(job_detail)
-                        
-                print('job_details*****************',job_details)
-                
-                #df = pd.json_normalize(jsonRes.get('results'))
-                
-                #df.to_excel('C:/Users/Cloud/Downloads/nested_output.xlsx', index=False)
-                
-                
-        
-    
-service =  AdzunaJobService()
+            # Check for HTTP errors (4xx or 5xx)
+            response.raise_for_status() 
+            
+            jsonRes = response.json()
+            adzure_job_details = {}
+            job_details = []
+            
+            results = jsonRes.get('results', [])
+            try:
+                for result in results:
+                # Using a nested try to ensure one bad record doesn't crash the loop
+                    job_detail = {
+                        'id': result.get('id'),
+                        'company_name': result.get('company', {}).get('display_name'),
+                        'title': result.get('title'),
+                        'redirect_url': result.get('redirect_url'),
+                        'description': result.get('description')
+                    }
+                    # Store as {id: data} as per your original structure
+                    adzure_job_details[result.get('id')] = job_detail
+                    job_details.append(job_detail)
+                    
+                print('job_detail*******************',len(job_detail))
+                if job_details:
+                    llmResList =  self.fetchCompanyInfo(job_details)
+                       
+                    if llmResList:
+                       
+                        for eRes in llmResList :
+                            #print('eRes************',eRes) 
+                            appId = eRes.get('application_id')
+                            detail = adzure_job_details.get(appId)
+                            if detail and detail.get('id') == appId:
+                                detail['employee_size'] = eRes.get('employee_size')
+                                detail['career_email_id'] = eRes.get('career_email_id')
+                                
+                        self.convertIntoExcel(list(adzure_job_details.values()))
+                               
+            except Exception as e:
+                print(f"Skipping a result due to format error: {e}")
 
-json_input = json_input = '''
+            print(f'Successfully retrieved {len(adzure_job_details)} jobs.')
+            print(f'Successfully retrieved {adzure_job_details} jobs.')
+            return adzure_job_details
+
+        except requests.exceptions.HTTPError as http_err:
+            print(f"HTTP error occurred: {http_err}")
+        except requests.exceptions.ConnectionError:
+            print("Error: Could not connect to the Adzuna API. Check your internet.")
+        except requests.exceptions.Timeout:
+            print("Error: The request timed out.")
+        except Exception as err:
+            print(f"An unexpected error occurred: {err}")
+            
+    def fetchCompanyInfo(self, job_details):
+        
+        if job_details is None:
+            raise ValueError("in the methood fetchCompanyInfo, job_details is empty.") 
+        #GEMENI_AI_API_KEY_VIK_PUVV
+        # GEMENI_API_KEY
+        response = AIAgent('GEMENI_AI_API_KEY_VIK_PUVV').gemeniAiConnect(job_details) 
+        print('response+++++++++++++++++++++',response)  
+            
+        if response is None or len(response) == 0:
+            raise ValueError(f"Response is empty from the llm, please check the connection")        
+                #pd.json_normalize(jsonRes.get('results'))
+                #df.to_excel('C:/Users/Cloud/Downloads/nested_output.xlsx', index=False
+        return response
+    
+    def convertIntoExcel(self, final_json):
+        # "C:\Users\Cloud\Downloads\ConsolidatedSheet27th1.xlsx"
+        if final_json:
+            df = pd.DataFrame(final_json)
+            df.to_excel('C:/Users/Cloud/Downloads/job_search_details.xlsx', index=False)
+        
+            
+
+# Execution
+json_input = '''
 {
   "category": "it-jobs",
   "max_days_old": 2,
@@ -101,13 +166,6 @@ json_input = json_input = '''
   "sort_by": "date"
 }
 '''
-
-service.job_search(json_input)
-#print('params********************',params.category)
-        
-
-
-
-    
-
-    
+service = AdzunaJobService(json_input)
+companyInfo = service.job_search()
+#print(f'companyInfo************* {companyInfo}')
