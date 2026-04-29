@@ -12,10 +12,11 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from AIClient import AIClient as AIAgent # Commented out as per original context
+from Constant import Constant as const
 
 
 
-# ADZUNE_APP_ID AND ADZUNE_API_KEY
+# ADZUNE_APP_ID AND ADZUNE_API_KEY , GoogleAppPassword_Vik_Puv
 @dataclass
 class AdzureApiParam:
     category: str 
@@ -35,8 +36,8 @@ class AdzunaJobService:
     def __init__(self, data : str):
         print('Inside the Adzure job service constructor')
         load_dotenv()
-        self.__appId = os.getenv('ADZUNE_APP_ID')
-        self.__apikey = os.getenv('ADZUNE_API_KEY')
+        self.__appId = os.getenv(const.ADZUNE_APP_ID)
+        self.__apikey = os.getenv(const.ADZUNE_API_KEY)
         self._search_data = data
         
     def parse_data(self, paramjSON: str) -> AdzureApiParam:
@@ -163,7 +164,7 @@ class AdzunaJobService:
             raise ValueError("in the methood fetchCompanyInfo, job_details is empty.") 
         #GEMENI_AI_API_KEY_VIK_PUVV
         # GEMENI_API_KEY
-        response = AIAgent('GEMENI_STUDIO_API_VIK_PRAN').gemeniAiConnect(job_details) 
+        response = AIAgent(const.GEMENI_STUDIO_API_VIK_PRAN).gemeniAiConnect(job_details) 
         print('response+++++++++++++++++++++',response)  
             
         if response is None or len(response) == 0:
@@ -179,7 +180,14 @@ class AdzunaJobService:
             df.to_excel('C:/Users/Cloud/Downloads/job_search_details.xlsx', index=False)
 
 
-#class emailMessage:     
+class emailMessage:
+    
+    def __int__(self):
+        print('email automation')
+        
+    def sendEmail(self):
+        pass
+             
             
 async def main():
     # Execution

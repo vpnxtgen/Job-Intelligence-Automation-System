@@ -1,0 +1,9 @@
+class Constant:
+    
+    ADZUNE_APP_ID : str = 'ADZUNE_APP_ID'
+    ADZUNE_API_KEY : str = 'ADZUNE_API_KEY'
+    GOOGLE_EMAIL_PASS : str = 'GoogleAppPassword_Vik_Puv'
+    GEMENI_AI_API_KEY_VIK_PUVV : str = 'GEMENI_AI_API_KEY_VIK_PUVV'
+    GEMENI_API_KEY : str = 'GEMENI_API_KEY'
+    GEMENI_STUDIO_API_VIK_PRAN : str = 'GEMENI_STUDIO_API_VIK_PRAN'
+
