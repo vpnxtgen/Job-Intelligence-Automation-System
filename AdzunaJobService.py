@@ -140,6 +140,7 @@ class AdzunaJobService:
                                     detail['employee_size'] = eRes.get('employee_size')
                                     detail['career_email_id'] = eRes.get('career_email_id')
                                     detail['email_draft'] = eRes.get('email_draft')
+                                    detail['email_subject'] = eRes.get('email_subject')
                             
                             sender().send_email(list(adzure_job_details.values()))       
                             self.convertIntoExcel(list(adzure_job_details.values()))

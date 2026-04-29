@@ -32,6 +32,7 @@ class EmailSender:
             # 2. Open connection once
             with smtplib.SMTP(EmailConfig.SERVER, EmailConfig.PORT) as server:
                 server.starttls()
+                print("Logging in...")
                 server.login(EmailConfig.SENDER, EmailConfig.PASSWORD)
 
                 for person in jsonList:
@@ -61,3 +62,29 @@ class EmailSender:
             print("Authentication failed. Check your email/app password.")
         except Exception as e:
             print(f"A connection error occurred: {e}")
+
+
+'''
+# REPLACE THESE TWO STRINGS
+MY_EMAIL = "vikranthpuvvadi@gmail.com"  # Ensure the 'l' is there!
+MY_APP_PASS = const.GOOGLE_EMAIL_PASS          # NO SPACES
+
+try:
+    print("Step 1: Connecting to Gmail...")
+    server = smtplib.SMTP("smtp.gmail.com", 587)
+    
+    print("Step 2: Starting TLS...")
+    server.starttls()
+    
+    print(f"Step 3: Attempting login for {MY_EMAIL}...")
+    server.login(MY_EMAIL, MY_APP_PASS)
+    
+    print("✅ SUCCESS! Your account and password are working.")
+    server.quit()
+
+except smtplib.SMTPAuthenticationError:
+    print("❌ FAILED: Username or App Password rejected by Google.")
+    print("Check: 1. Is 2-Step Verification ON? 2. Is this a 16-letter App Pass?")
+except Exception as e:
+    print(f"❌ AN ERROR OCCURRED: {e}")
+'''
