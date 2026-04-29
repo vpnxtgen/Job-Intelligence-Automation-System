@@ -8,6 +8,9 @@ from dataclasses import dataclass
 from urllib.parse import urlencode
 import requests
 import pandas as pd
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from AIClient import AIClient as AIAgent # Commented out as per original context
 
 
@@ -121,10 +124,10 @@ class AdzunaJobService:
                         adzure_job_details[result.get('id')] = job_detail
                         job_details.append(job_detail)
                         
-                    print('job_detail*******************',len(job_detail))
+                    #print('job_detail*******************',len(job_detail))
                     if job_details:
-                        llmResList =  self.fetchCompanyInfo(job_details)
-                        
+                        llmResList =  await self.fetchCompanyInfo(job_details)
+                        #print('llmResList************',llmResList)
                         if llmResList:
                         
                             for eRes in llmResList :
@@ -134,6 +137,7 @@ class AdzunaJobService:
                                 if detail and detail.get('id') == appId:
                                     detail['employee_size'] = eRes.get('employee_size')
                                     detail['career_email_id'] = eRes.get('career_email_id')
+                                    detail['email_draft'] = eRes.get('email_draft')
                                     
                             self.convertIntoExcel(list(adzure_job_details.values()))
                                
@@ -153,13 +157,13 @@ class AdzunaJobService:
             except Exception as err:
                 print(f"An unexpected error occurred: {err}")
             
-    def fetchCompanyInfo(self, job_details):
+    async def fetchCompanyInfo(self, job_details):
         
         if job_details is None:
             raise ValueError("in the methood fetchCompanyInfo, job_details is empty.") 
         #GEMENI_AI_API_KEY_VIK_PUVV
         # GEMENI_API_KEY
-        response = AIAgent('GEMENI_AI_API_KEY_VIK_PUVV').gemeniAiConnect(job_details) 
+        response = AIAgent('GEMENI_STUDIO_API_VIK_PRAN').gemeniAiConnect(job_details) 
         print('response+++++++++++++++++++++',response)  
             
         if response is None or len(response) == 0:
@@ -173,7 +177,9 @@ class AdzunaJobService:
         if final_json:
             df = pd.DataFrame(final_json)
             df.to_excel('C:/Users/Cloud/Downloads/job_search_details.xlsx', index=False)
-        
+
+
+#class emailMessage:     
             
 async def main():
     # Execution
