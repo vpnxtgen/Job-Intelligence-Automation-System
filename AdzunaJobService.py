@@ -13,6 +13,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from AIClient import AIClient as AIAgent # Commented out as per original context
 from Constant import Constant as const
+from EmailSender import EmailSender as sender
 
 
 
@@ -139,8 +140,10 @@ class AdzunaJobService:
                                     detail['employee_size'] = eRes.get('employee_size')
                                     detail['career_email_id'] = eRes.get('career_email_id')
                                     detail['email_draft'] = eRes.get('email_draft')
-                                    
+                            
+                            sender().send_email(list(adzure_job_details.values()))       
                             self.convertIntoExcel(list(adzure_job_details.values()))
+                            
                                
                 except Exception as e:
                     print(f"Skipping a result due to format error: {e}")
@@ -179,15 +182,6 @@ class AdzunaJobService:
             df = pd.DataFrame(final_json)
             df.to_excel('C:/Users/Cloud/Downloads/job_search_details.xlsx', index=False)
 
-
-class emailMessage:
-    
-    def __int__(self):
-        print('email automation')
-        
-    def sendEmail(self):
-        pass
-             
             
 async def main():
     # Execution

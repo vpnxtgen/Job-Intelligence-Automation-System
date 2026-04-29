@@ -65,6 +65,7 @@ class AIClient:
                 "2. 'employee_size': Estimated total employee count.\n"
                 "3. 'career_email_id': Best contact email for applications.\n"
                 "4. 'email_draft': A professional, concise email draft applying for this role. "
+                "5. 'email_subject': A professional email suject to be added based on job description."
                 "The email must be from 'Vikranth Puvvadi' and tailored to the job description provided."
                 "The email must include the skills like Salesforce Integrations (REST, Bulk, Composite, Metadata, GraphQL, SAP, OAuth 2.0, Platform Events, CDC, Streaming API, Named/External Credentials, Connected Apps), Apex & Asynchronous Processing (Triggers, Batch, Queueable, Scheduled, Future, Governor Limit Optimization, Bulkification), Lightning Architecture (LWC, LDS, Wire Adapters, LMS, ES6, Reusable Components), Automation & Service Cloud (Flows, Approval Processes, Omni-Channel, Case Management), Multi-Cloud Expertise (Sales, Service, Experience, Education, Revenue Clouds), Data Modeling & Security Architecture (Schema Design, Sharing Rules, Permission Sets, OWD, FLS), and Deployment/Data Tools (Git, Copado, Change Sets, Workbench, Data Loader)."
             )
@@ -83,9 +84,10 @@ class AIClient:
                                 'company_name': {'type': 'STRING'},
                                 'employee_size': {'type': 'STRING'},
                                 'career_email_id': {'type': 'STRING'},
-                                'email_draft': {'type': 'STRING'}
+                                'email_draft': {'type': 'STRING'},
+                                'email_subject' : {'type': 'STRING'}
                             },
-                            'required': ['application_id', 'company_name', 'employee_size', 'career_email_id', 'email_draft']
+                            'required': ['application_id', 'company_name', 'employee_size', 'career_email_id', 'email_draft', 'email_subject']
                         }
                     }
                 }
