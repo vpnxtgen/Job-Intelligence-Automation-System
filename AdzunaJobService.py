@@ -94,22 +94,10 @@ class AdzunaJobService:
                         
                         # Check for HTTP errors (4xx or 5xx)
                         #response.raise_for_status() 
-                responses = await asyncio.gather(*tasks, return_exceptions=True)
-
+                results = await self.aiohttpGet(tasks)  #await asyncio.gather(*tasks, return_exceptions=True)     
                 adzure_job_details = {}
                 job_details = []
                 
-                for response in responses:
-                    if isinstance(response, Exception):
-                        print(f"Request failed: {response}")
-                        continue
-                    
-                    async with response:
-                        if response.status == 200:
-                            jsonRes = await response.json() 
-                            results.extend(jsonRes.get('results', []))
-                        else : 
-                            print(f"Error {response.status} from API")
 
                 try:
                     print('results************', len(results))
@@ -120,7 +108,9 @@ class AdzunaJobService:
                             'company_name': result.get('company', {}).get('display_name'),
                             'title': result.get('title'),
                             'redirect_url': result.get('redirect_url'),
-                            'description': result.get('description')
+                            'description': result.get('description'),
+                            'location' : result.get('location','Bengalore'),
+                            'applyUrl' : result.get('applyUrl')
                         }
                         # Store as {id: data} as per your original structure
                         adzure_job_details[result.get('id')] = job_detail
@@ -131,7 +121,6 @@ class AdzunaJobService:
                         llmResList =  await self.fetchCompanyInfo(job_details)
                         #print('llmResList************',llmResList)
                         if llmResList:
-                        
                             for eRes in llmResList :
                                 #print('eRes************',eRes) 
                                 appId = eRes.get('application_id')
@@ -161,6 +150,39 @@ class AdzunaJobService:
                 print("Error: The request timed out.")
             except Exception as err:
                 print(f"An unexpected error occurred: {err}")
+                                
+    async def aiohttpGet(self, tasks):
+        responses = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        all_results = []
+
+        for response in responses:
+            if isinstance(response, Exception):
+                print(f"Request failed: {response}")
+                continue
+
+            async with response:
+                if response.status == 200:
+                    jsonRes = await response.json()
+                    all_results.extend(jsonRes.get('results', []))
+                else:
+                    print(f"Error {response.status} from API")
+
+        return all_results
+    
+    async def aiohttpPost(self, baseUrl , payload):
+        print('baseUrl******************')
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(baseUrl, json=payload) as response:
+                    response.raise_for_status()
+                    return await response.json()
+
+        except aiohttp.ClientError as e:
+            print("HTTP Error:", e)
+        except Exception as e:
+            print("Unexpected error:", e)
+        
             
     async def fetchCompanyInfo(self, job_details):
         
@@ -178,10 +200,18 @@ class AdzunaJobService:
         return response
     
     def convertIntoExcel(self, final_json):
-        # "C:\Users\Cloud\Downloads\ConsolidatedSheet27th1.xlsx"
+        file_path = 'C:/Users/Cloud/Downloads/job_search_details.xlsx'
+
         if final_json:
             df = pd.DataFrame(final_json)
-            df.to_excel('C:/Users/Cloud/Downloads/job_search_details.xlsx', index=False)
+
+            try:
+                # Append to existing file
+                with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
+                    df.to_excel(writer, index=False, header=False, startrow=writer.sheets['Sheet1'].max_row)
+            except FileNotFoundError:
+                # If file doesn't exist, create new
+                df.to_excel(file_path, index=False)
 
             
 async def main():
