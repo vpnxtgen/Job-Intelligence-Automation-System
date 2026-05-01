@@ -120,19 +120,19 @@ class AdzunaJobService:
                     #print('job_detail*******************',len(job_detail))
                     if job_details:
                         llmResList =  await self.fetchCompanyInfo(job_details)
-                        #print('llmResList************',llmResList)
+                        print('llmResList************',llmResList[0:3])
                         if llmResList:
                             for eRes in llmResList :
                                 #print('eRes************',eRes) 
-                                appId = eRes.get('application_id')
+                                appId = eRes.get('App_Ext_Id__c')
                                 detail = adzure_job_details.get(appId)
                                 if detail and detail.get('App_Ext_Id__c') == appId:
-                                    detail['employee_size'] = eRes.get('employee_size')
-                                    detail['career_email_id'] = eRes.get('career_email_id')
-                                    detail['email_draft'] = eRes.get('email_draft')
-                                    detail['email_subject'] = eRes.get('email_subject')
+                                    detail['Employee_Size__c'] = eRes.get('Employee_Size__c')
+                                    detail['Career_Email_Id__c'] = eRes.get('Career_Email_Id__c')
+                                    detail['Email_Draft__c'] = eRes.get('Email_Draft__c')
+                                    detail['Email_Subject__c'] = eRes.get('Email_Subject__c')
                             
-                            sender().send_email(list(adzure_job_details.values()))       
+                            #sender().send_email(list(adzure_job_details.values()))       
                             self.convertIntoExcel(list(adzure_job_details.values()))
                             self.insertIntoSf(list(adzure_job_details.values()))    
                             
@@ -141,7 +141,7 @@ class AdzunaJobService:
                     print(f"Skipping a result due to format error: {e}")
 
                 print(f'Successfully retrieved {len(adzure_job_details)} jobs.')
-                print(f'Successfully retrieved {adzure_job_details} jobs.')
+                #print(f'Successfully retrieved {adzure_job_details} jobs.')
                 return adzure_job_details
 
             except requests.exceptions.HTTPError as http_err:
@@ -192,7 +192,7 @@ class AdzunaJobService:
             raise ValueError("in the methood fetchCompanyInfo, job_details is empty.") 
         #GEMENI_AI_API_KEY_VIK_PUVV
         # GEMENI_API_KEY
-        response = AIAgent(const.GEMENI_STUDIO_API_VIK_PRAN).gemeniAiConnect(job_details) 
+        response = AIAgent(const.GEMENI_API_KEY).gemeniAiConnect(job_details) 
         print('response+++++++++++++++++++++',response)  
             
         if response is None or len(response) == 0:
@@ -217,13 +217,13 @@ class AdzunaJobService:
     
     def insertIntoSf(self, json_data):
         try:
+            print('inside the insertIntoSf method******************')
             sfDataService = sfData()
-            sfDataService.sfConnect()
+            sfDataService.connect()
             sfDataService.upsertDataIntoSf(json_data)
         except Exception as e:
             print(f"Error inserting into Salesforce: {e}")
-
-            
+    
 async def main():
     # Execution
     json_input = '''

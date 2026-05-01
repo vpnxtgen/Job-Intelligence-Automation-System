@@ -61,11 +61,11 @@ class AIClient:
             prompt = (
                 f"Analyze the following job details: {request}. "
                 "For each job, provide the following information in a valid JSON list format:\n"
-                "1. 'application_id': The ID provided in the request.\n"
-                "2. 'employee_size': Estimated total employee count.\n"
-                "3. 'career_email_id': Best contact email for applications.\n"
-                "4. 'email_draft': A professional, concise email draft applying for this role. "
-                "5. 'email_subject': A professional email suject to be added based on job description."
+                "1. 'App_Ext_Id__c': The ID provided in the request.\n"
+                "2. 'Employee_Size__c': Estimated total employee count.\n"
+                "3. 'Career_Email_Id__c': Best contact email for applications.\n"
+                "4. 'Email_Draft__c': A professional, concise email draft applying for this role. "
+                "5. 'Email_Subject__c': A professional email subject to be added based on job description."
                 "The email must be from 'Vikranth Puvvadi' and tailored to the job description provided."
                 "The email must include the skills like Salesforce Integrations (REST, Bulk, Composite, Metadata, GraphQL, SAP, OAuth 2.0, Platform Events, CDC, Streaming API, Named/External Credentials, Connected Apps), Apex & Asynchronous Processing (Triggers, Batch, Queueable, Scheduled, Future, Governor Limit Optimization, Bulkification), Lightning Architecture (LWC, LDS, Wire Adapters, LMS, ES6, Reusable Components), Automation & Service Cloud (Flows, Approval Processes, Omni-Channel, Case Management), Multi-Cloud Expertise (Sales, Service, Experience, Education, Revenue Clouds), Data Modeling & Security Architecture (Schema Design, Sharing Rules, Permission Sets, OWD, FLS), and Deployment/Data Tools (Git, Copado, Change Sets, Workbench, Data Loader)."
             )
@@ -80,14 +80,14 @@ class AIClient:
                         'items': {
                             'type': 'OBJECT',
                             'properties': {
-                                'application_id': {'type': 'STRING'},
-                                'company_name': {'type': 'STRING'},
-                                'employee_size': {'type': 'STRING'},
-                                'career_email_id': {'type': 'STRING'},
-                                'email_draft': {'type': 'STRING'},
-                                'email_subject' : {'type': 'STRING'}
+                                'App_Ext_Id__c': {'type': 'STRING'},
+                                'Company_Name__c': {'type': 'STRING'},
+                                'Employee_Size__c': {'type': 'STRING'},
+                                'Career_Email_Id__c': {'type': 'STRING'},
+                                'Email_Draft__c': {'type': 'STRING'},
+                                'Email_Subject__c' : {'type': 'STRING'}
                             },
-                            'required': ['application_id', 'company_name', 'employee_size', 'career_email_id', 'email_draft', 'email_subject']
+                            'required': ['App_Ext_Id__c', 'Company_Name__c', 'Employee_Size__c', 'Career_Email_Id__c', 'Email_Draft__c', 'Email_Subject__c']
                         }
                     }
                 }
