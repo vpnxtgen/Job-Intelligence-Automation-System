@@ -14,6 +14,7 @@ from email.mime.multipart import MIMEMultipart
 from AIClient import AIClient as AIAgent # Commented out as per original context
 from Constant import Constant as const
 from EmailSender import EmailSender as sender
+from SfDataService import SFDataService as sfData
 
 
 
@@ -104,13 +105,13 @@ class AdzunaJobService:
                     for result in results:
                     # Using a nested try to ensure one bad record doesn't crash the loop
                         job_detail = {
-                            'id': result.get('id'),
-                            'company_name': result.get('company', {}).get('display_name'),
-                            'title': result.get('title'),
-                            'redirect_url': result.get('redirect_url'),
-                            'description': result.get('description'),
-                            'location' : result.get('location','Bengalore'),
-                            'applyUrl' : result.get('applyUrl')
+                            'App_Ext_Id__c': result.get('id'),
+                            'Company_Name__c': result.get('company', {}).get('display_name'),
+                            'Title__c': result.get('title'),
+                            'ReDirect_url__c': result.get('redirect_url'),
+                            'Description__c': result.get('description'),
+                            'location__c' : result.get('location','Bengalore'),
+                            'ApplyUrl__c' : result.get('applyUrl','https://www.google.com/search')
                         }
                         # Store as {id: data} as per your original structure
                         adzure_job_details[result.get('id')] = job_detail
@@ -125,7 +126,7 @@ class AdzunaJobService:
                                 #print('eRes************',eRes) 
                                 appId = eRes.get('application_id')
                                 detail = adzure_job_details.get(appId)
-                                if detail and detail.get('id') == appId:
+                                if detail and detail.get('App_Ext_Id__c') == appId:
                                     detail['employee_size'] = eRes.get('employee_size')
                                     detail['career_email_id'] = eRes.get('career_email_id')
                                     detail['email_draft'] = eRes.get('email_draft')
@@ -133,6 +134,7 @@ class AdzunaJobService:
                             
                             sender().send_email(list(adzure_job_details.values()))       
                             self.convertIntoExcel(list(adzure_job_details.values()))
+                            self.insertIntoSf(list(adzure_job_details.values()))    
                             
                                
                 except Exception as e:
@@ -212,6 +214,14 @@ class AdzunaJobService:
             except FileNotFoundError:
                 # If file doesn't exist, create new
                 df.to_excel(file_path, index=False)
+    
+    def insertIntoSf(self, json_data):
+        try:
+            sfDataService = sfData()
+            sfDataService.sfConnect()
+            sfDataService.upsertDataIntoSf(json_data)
+        except Exception as e:
+            print(f"Error inserting into Salesforce: {e}")
 
             
 async def main():

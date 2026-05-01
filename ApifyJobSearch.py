@@ -4,15 +4,21 @@ import aiohttp
 import asyncio
 from EmailSender import EmailSender as sender
 from Constant import Constant as const
+from dotenv import load_dotenv
+import os
+
 class apifyjobsearch:
     
-    api_key = const.APIFY_API_KEY
+    api_key :str
     author_name = 'cheap_scraper/linkedin-job-scraper'
-    actor_id = const.APIFY_ACTOR_ID
+    actor_id : str
     aSyncApiService 
     def __init__(self):
+        load_dotenv()
         self.aSyncApiService = aSyncApiService('{}')
-        print('apify job search')
+        self.api_key = os.getenv('APIFY_API_KEY') 
+        self.author_name = os.getenv(const.APIFY_ACTOR_ID) 
+        print('apify job search*******************8',self.api_key)
     
     
     def linkedinJobSearchAutor(self):
@@ -44,7 +50,7 @@ class apifyjobsearch:
     
     async def linkdinJobSearchDetails(self):
         
-        end_point = 'https://api.apify.com/v2/acts/cheap_scraper~linkedin-job-scraper/run-sync-get-dataset-items?token=' + self.api_key
+        end_point = f'https://api.apify.com/v2/acts/cheap_scraper~linkedin-job-scraper/run-sync-get-dataset-items?token={self.api_key}'
         payload = self.parse_data()
         try : 
             job_details = {}
@@ -174,13 +180,13 @@ class apifyjobsearch:
                 posted = eRes.get('postedTime').split() if eRes.get('postedTime') is not None else None
                 if posted is not None and int(posted[0]) <= 24:
                     job_detail = {
-                                'id': eRes.get('jobId'),
-                                'company_name': eRes.get('companyName', {}),
-                                'title': eRes.get('title'),
-                                'redirect_url': eRes.get('jobUrl'),
-                                'description': eRes.get('description'),
-                                'location' : eRes.get('location'),
-                                'applyUrl' : eRes.get('applyUrl')
+                                'App_Ext_Id__c': eRes.get('jobId'),
+                                'Company_Name__c': eRes.get('companyName', {}),
+                                'Title__c': eRes.get('title'),
+                                'ReDirect_url__c': eRes.get('jobUrl'),
+                                'Description__c': eRes.get('description'),
+                                'location__c' : eRes.get('location'),
+                                'ApplyUrl__c' : eRes.get('applyUrl')
                             }
                     job_details[eRes.get('jobId')]=  job_detail
             
@@ -194,15 +200,16 @@ class apifyjobsearch:
                         #print('eRes************',eRes) 
                         appId = eRes.get('application_id')
                         detail = job_details.get(appId)
-                        if detail and detail.get('id') == appId:
-                            detail['employee_size'] = eRes.get('employee_size')
-                            detail['career_email_id'] = eRes.get('career_email_id')
-                            detail['email_draft'] = eRes.get('email_draft')
-                            detail['email_subject'] = eRes.get('email_subject')
+                        if detail and detail.get('App_Ext_Id__c') == appId:
+                            detail['Employee_Size__c'] = eRes.get('employee_size')
+                            detail['Career_Email_Id__c'] = eRes.get('career_email_id')
+                            detail['email_draft__c'] = eRes.get('email_draft')
+                            detail['Email_Subject__c'] = eRes.get('email_subject')
                 
                 #sender().send_email(list(job_details.values()))
                 self.aSyncApiService.convertIntoExcel(list(job_details.values()))
-               
+                self.aSyncApiService.insertIntoSf(list(job_details.values()))
+
         except Exception as err:
                 print(f"An unexpected error occurred: {err}")
             

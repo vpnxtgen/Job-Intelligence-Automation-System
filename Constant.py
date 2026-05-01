@@ -10,3 +10,8 @@ class Constant:
     SERVER_NAME : str = "smtp.gmail.com"
     PORT = 587
     FILE_PATH : str = "C:/Users/Cloud/Downloads/Vikranth_v3_Resume1.pdf"
+    APIFY_API_KEY : str = 'APIFY_API_KEY'
+    APIFY_ACTOR_ID : str = 'APIFY_ACTOR_ID'
+    SF_VIK_1 : str = 'SF_VIK_1'
+    SF_PASS_1 : str = 'SF_PASS_1'
+    SF_TOKEN_1 : str = 'SF_TOKEN_1'
