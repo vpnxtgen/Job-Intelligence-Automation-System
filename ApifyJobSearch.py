@@ -18,7 +18,7 @@ class apifyjobsearch:
         self.aSyncApiService = aSyncApiService('{}')
         self.api_key = os.getenv('APIFY_API_KEY') 
         self.author_name = os.getenv(const.APIFY_ACTOR_ID) 
-        print('apify job search*******************8',self.api_key)
+        #print('apify job search*******************8',self.api_key)
     
     
     def linkedinJobSearchAutor(self):

@@ -88,7 +88,7 @@ class AdzunaJobService:
                         }
                     
                         serviceQuery = base_url + urlencode(query_params)
-                        print(f'Fetching jobs from: {serviceQuery}')
+                        #print(f'Fetching jobs from: {serviceQuery}')
                         tasks.append(session.get(serviceQuery))
                     # Use a try block for the network request
                         #response = await client.get(serviceQuery, timeout=10)
@@ -120,7 +120,7 @@ class AdzunaJobService:
                     #print('job_detail*******************',len(job_detail))
                     if job_details:
                         llmResList =  await self.fetchCompanyInfo(job_details)
-                        print('llmResList************',llmResList[0:3])
+                        #print('llmResList************',llmResList[0:3])
                         if llmResList:
                             for eRes in llmResList :
                                 #print('eRes************',eRes) 

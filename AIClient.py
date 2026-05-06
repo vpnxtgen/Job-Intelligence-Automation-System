@@ -21,8 +21,7 @@ class AIClient:
     
     @ApiKey.setter
     def ApiKey(self, value):
-        self.apikey = os.getenv(value) 
-        print('os.getenv(value)*************', self.apikey)
+        self.apikey = os.getenv(value)
         if self.apikey is None:
             # Fixed: raising a ValueError instead of just a string
             raise ValueError(f"Environment variable {value} not found. Please assign the value.")
