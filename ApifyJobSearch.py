@@ -5,6 +5,7 @@ import asyncio
 from EmailSender import EmailSender as sender
 from Constant import Constant as const
 from dotenv import load_dotenv
+from datetime import datetime, timezone, timedelta
 import os
 
 class apifyjobsearch:
@@ -178,7 +179,9 @@ class apifyjobsearch:
             
             for eRes in responses:
                 posted = eRes.get('postedTime').split() if eRes.get('postedTime') is not None else None
-                if posted is not None and int(posted[0]) <= 24:
+                publishedAt = eRes.get('publishedAt')
+                isRecent = self.checkPublishDate(publishedAt)
+                if posted is not None and int(posted[0]) <= 24 and isRecent:
                     job_detail = {
                                 'App_Ext_Id__c': eRes.get('jobId'),
                                 'Company_Name__c': eRes.get('companyName', {}),
@@ -186,7 +189,8 @@ class apifyjobsearch:
                                 'ReDirect_url__c': eRes.get('jobUrl'),
                                 'Description__c': eRes.get('description'),
                                 'location__c' : eRes.get('location'),
-                                'ApplyUrl__c' : eRes.get('applyUrl')
+                                'ApplyUrl__c' : eRes.get('applyUrl'),
+                                'publishedAt__c' : eRes.get('publishedAt')
                             }
                     job_details[eRes.get('jobId')]=  job_detail
             
@@ -212,7 +216,31 @@ class apifyjobsearch:
 
         except Exception as err:
                 print(f"An unexpected error occurred: {err}")
+    
+    
+    def checkPublishDate(self, publishedAt):
+        try:
+           # 1. Setup IST Timezone
+            IST = timezone(timedelta(hours=5, minutes=30))
+
+            # 2. Convert the UTC string to IST Date
+            published_at_utc = datetime.fromisoformat(publishedAt.replace("Z", "+00:00"))
+            published_date_ist = published_at_utc.astimezone(IST).date()
             
+            # 3. Get Today's Date in IST
+            today_ist = datetime.now(IST).date()
+            
+            # 4. Compare the Published Date with Today's Date
+            difference = (today_ist - published_date_ist).days
+            
+            if difference <= 4:
+                return True   
+                  
+            return False
+        
+        except Exception as e:
+            print(f"Error parsing published time: {e}")
+            return False
 
 async def main():      
     service = apifyjobsearch()

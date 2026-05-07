@@ -111,7 +111,8 @@ class AdzunaJobService:
                             'ReDirect_url__c': result.get('redirect_url'),
                             'Description__c': result.get('description'),
                             'location__c' : result.get('location','Bengalore'),
-                            'ApplyUrl__c' : result.get('applyUrl','https://www.google.com/search')
+                            'ApplyUrl__c' : result.get('applyUrl','https://www.google.com/search'),
+                            'publishedAt__c' : result.get('created',None)
                         }
                         # Store as {id: data} as per your original structure
                         adzure_job_details[result.get('id')] = job_detail
