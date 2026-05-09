@@ -1,0 +1,64 @@
+from ApifyJobSearch import apifyjobsearch as linkedInSearch
+from AdzunaJobService import AdzunaJobService as adzunaSearch
+from Constant import Constant as const 
+from flask import Flask, render_template, request
+
+class JobScrubber:
+        
+    def executeAdzunaSearch(self):
+        try:
+            json_input = {
+                "category": "it-jobs",
+                "max_days_old": 2,
+                "where": "Bengaluru OR Hyderabad",
+                "sort_by": "date"
+            }
+            service = adzunaSearch(json_input)
+            service.job_search(2)
+        except Exception as e:
+            print(f"Error executing Adzuna search: {e}")
+            
+    def executeLinkedInSearch(self):
+        try:
+            service = linkedInSearch()
+            service.linkdinJobSearchDetails()
+           
+        except Exception as e:
+            print(f"Error executing LinkedIn search: {e}")
+            
+app = Flask(__name__)
+scraper = JobScrubber()
+
+@app.route('/')
+def index():
+    return render_template('JobNexus.html')
+
+
+@app.route('/job-nexus', methods=['POST'])
+def run_script():
+
+    job_type = request.form.get('job_list')
+
+    if job_type == 'adzuna':
+        scraper.executeAdzunaSearch()
+        result = "Adzuna search executed successfully."
+
+    elif job_type == 'linkedin':
+        scraper.executeLinkedInSearch()
+        result = "LinkedIn search executed successfully."
+
+    else:
+        result = "No script found for this selection."
+
+    return f"""
+    <h1>Server Response</h1>
+    <p>{result}</p>
+    <a href='/'>Back</a>
+    """
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+    
+        
+    

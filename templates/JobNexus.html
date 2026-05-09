@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Job Script Runner</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #ff7b00 0%, #ffb347 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border-radius: 1.5rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .custom-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23f97316' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 7l4.5 4.5L14.5 7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="glass-card p-8 w-full max-w-md mx-4">
+
+        <div class="text-center mb-8">
+            <h2 class="text-4xl font-extrabold text-orange-600">
+                Job Engine
+            </h2>
+
+            <p class="text-gray-600 mt-3">
+                Select a platform to trigger the Python class
+            </p>
+        </div>
+
+    
+        <!-- Change action="/jobscrubber" to action="/run-script" -->
+        <form action="/job-nexus" method="post" class="space-y-6">
+
+            <div>
+                <label 
+                    for="job_list"
+                    class="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                    Data Source
+                </label>
+
+                <select
+                    name="job_list"
+                    id="job_list"
+                    required
+                    class="custom-select block w-full px-4 py-3 rounded-xl border border-orange-200 bg-orange-50 focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition duration-300 outline-none text-gray-700 appearance-none"
+                >
+                    <option value="" disabled selected>
+                        Choose a platform...
+                    </option>
+
+                    <option value="adzuna">AdzunaJob</option>
+                    <option value="linkedin">LinkedIn</option>
+                    <option value="indeed">Indeed</option>
+                </select>
+            </div>
+
+            <button
+                type="submit"
+                class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                >
+                    <path fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                        clip-rule="evenodd"
+                    />
+                </svg>
+
+                Run Python Script
+            </button>
+
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-orange-100 text-center text-xs text-gray-500">
+            Automated Job Data Integration v1.0
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -241,7 +241,9 @@ class apifyjobsearch:
         except Exception as e:
             print(f"Error parsing published time: {e}")
             return False
-
+        
+        
+'''
 async def main():      
     service = apifyjobsearch()
     await service.linkdinJobSearchDetails()
@@ -249,3 +251,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+'''

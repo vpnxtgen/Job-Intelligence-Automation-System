@@ -224,10 +224,11 @@ class AdzunaJobService:
             sfDataService.upsertDataIntoSf(json_data)
         except Exception as e:
             print(f"Error inserting into Salesforce: {e}")
-    
+
+'''
 async def main():
     # Execution
-    json_input = '''
+    json_input = 
     {
     "category": "it-jobs",
     "max_days_old": 2,
@@ -235,7 +236,7 @@ async def main():
     "where": "Bengaluru OR Hyderabad",
     "sort_by": "date"
     }
-    '''
+    
     service = AdzunaJobService(json_input)
     companyInfo = await service.job_search(2)
 #print(f'companyInfo************* {companyInfo}')
@@ -243,3 +244,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+'''
