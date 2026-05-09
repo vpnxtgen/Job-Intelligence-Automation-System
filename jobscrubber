@@ -5,23 +5,26 @@ from flask import Flask, render_template, request
 
 class JobScrubber:
         
-    def executeAdzunaSearch(self):
+    async def executeAdzunaSearch(self):
         try:
-            json_input = {
-                "category": "it-jobs",
-                "max_days_old": 2,
-                "where": "Bengaluru OR Hyderabad",
-                "sort_by": "date"
-            }
+            json_input = ''' 
+                        {
+                            "category": "it-jobs",
+                            "max_days_old": 2,
+                            "what": "salesforce+developer",
+                            "where": "Bengaluru OR Hyderabad",
+                            "sort_by": "date"
+                        } 
+                    '''
             service = adzunaSearch(json_input)
-            service.job_search(2)
+            await service.job_search(2)
         except Exception as e:
             print(f"Error executing Adzuna search: {e}")
             
-    def executeLinkedInSearch(self):
+    async def executeLinkedInSearch(self):
         try:
             service = linkedInSearch()
-            service.linkdinJobSearchDetails()
+            await service.linkdinJobSearchDetails()
            
         except Exception as e:
             print(f"Error executing LinkedIn search: {e}")
@@ -35,16 +38,16 @@ def index():
 
 
 @app.route('/job-nexus', methods=['POST'])
-def run_script():
+async def run_script():
 
     job_type = request.form.get('job_list')
 
     if job_type == 'adzuna':
-        scraper.executeAdzunaSearch()
+        await scraper.executeAdzunaSearch()
         result = "Adzuna search executed successfully."
 
     elif job_type == 'linkedin':
-        scraper.executeLinkedInSearch()
+        await scraper.executeLinkedInSearch()
         result = "LinkedIn search executed successfully."
 
     else:
